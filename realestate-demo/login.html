@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Modal</title>
+<link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+<button id="loginBtn" class="login-btn">Login</button>
+
+<div id="overlay" class="overlay">
+  <div class="modal">
+    <button id="closeBtn" class="close">&times;</button>
+    <h2>Login / Register</h2>
+
+    <div class="tabs">
+      <button class="tab active" data-target="phone">Phone</button>
+      <button class="tab" data-target="email">Email</button>
+    </div>
+
+    <div id="phone" class="content active">
+      <label>Phone Number</label>
+      <div class="phone-box">
+        <span>+91</span>
+        <input id="phoneInput" type="tel" maxlength="10" placeholder="Enter phone number">
+      </div>
+      <button id="phoneLogin" class="primary">Continue</button>
+    </div>
+
+    <div id="email" class="content">
+      <label>Email</label>
+      <input id="emailInput" type="email" placeholder="Enter email">
+      <label>Password</label>
+      <div class="password-box">
+        <input id="passwordInput" type="password" placeholder="Password">
+        <button id="togglePwd" type="button">Show</button>
+      </div>
+      <a href="#">Forgot Password?</a>
+      <button id="emailLogin" class="primary">Login</button>
+    </div>
+
+    <div class="divider">OR</div>
+
+    <button class="google">Continue with Google</button>
+
+    <p>New User? <a href="#">Register</a></p>
+  </div>
+</div>
+
+<script src="login.js"></script>
+</body>
+</html>

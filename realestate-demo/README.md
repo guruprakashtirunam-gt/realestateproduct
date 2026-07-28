@@ -1,3 +1,31 @@
+# Demo auth server for realestate-demo
+
+This folder contains a tiny Express backend to demonstrate OTP login and a mock Google endpoint.
+
+Files:
+- `server.js` — demo Express server with `/api/send-otp`, `/api/verify-otp`, `/api/google`, `/api/register`.
+- `login.js` — frontend updated to call the demo endpoints.
+- `login.css`, `UI.html` — updated UI.
+
+Run locally:
+
+1. Install dependencies
+
+```bash
+cd realestate-demo
+npm install
+```
+
+2. Start the demo server
+
+```bash
+npm start
+```
+
+3. Open `UI.html` in your browser and click Login. When you click Next, the server console will print the OTP.
+
+Notes:
+- This is a demo-only implementation. Do not use in production.
 # Indian Realty Hub — Demo
 
 A self-contained static demo page (`demo.html`). It has no build step and no local

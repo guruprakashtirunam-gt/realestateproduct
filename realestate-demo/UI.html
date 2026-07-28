@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Indian Realty Hub — Find Homes Across India</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0Q5QTU1MiIvPjwvc3ZnPg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,450&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -292,6 +293,7 @@
   }
   @media (max-width:860px){.footer-grid{grid-template-columns:1fr 1fr;}}
 </style>
+<link rel="stylesheet" href="login.css">
 </head>
 <body>
 
@@ -313,7 +315,14 @@
       <a href="#calculator">EMI Calculator</a>
       <a href="#agents">Agents</a>
     </div>
-    <a class="btn" href="#contact">Book a Site Visit</a>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div id="userState" style="display:none; align-items:center; gap:8px;">
+        <span id="userName" class="btn" style="background:transparent; border:none; padding:6px 12px; color:var(--paper);">Hi</span>
+        <button id="logoutBtn" class="btn">Logout</button>
+      </div>
+      <button class="btn btn-solid login-open-btn" id="loginBtn" type="button">Login</button>
+      <a class="btn" href="#contact">Book a Site Visit</a>
+    </div>
   </nav>
 </header>
 
@@ -512,7 +521,7 @@
     <div class="eyebrow" style="justify-content:center;">Stay ahead of the market</div>
     <h2 style="margin-top:20px;">Get new listings in your city before they go live.</h2>
     <form class="cta-form" id="newsletter-form">
-      <input type="email" placeholder="you@email.com" required>
+      <input id="newsletter-email" type="email" placeholder="you@email.com" required>
       <button type="submit">Notify Me</button>
     </form>
     <div class="form-note" id="newsletter-note">No spam. One email a week, max — unsubscribe any time.</div>
@@ -564,7 +573,83 @@
   </div>
 </div>
 
+<!-- Inquiry modal -->
+<div class="modal-backdrop" id="inquiry-backdrop" style="display:none;">
+  <div class="modal">
+    <button class="modal-close" id="inquiry-close">✕</button>
+    <div class="modal-body" style="padding:28px;">
+      <h3>Request a Visit</h3>
+      <form id="inquiry-form">
+        <input type="hidden" id="inquiry-property-id">
+        <div style="margin-top:12px;"><label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted);">Name</label><input id="inquiry-name" required style="width:100%; padding:10px; background:transparent; border:1px solid var(--line); color:var(--paper);" /></div>
+        <div style="margin-top:12px;"><label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted);">Phone</label><input id="inquiry-phone" required style="width:100%; padding:10px; background:transparent; border:1px solid var(--line); color:var(--paper);" /></div>
+        <div style="margin-top:12px;"><label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted);">Email</label><input id="inquiry-email" style="width:100%; padding:10px; background:transparent; border:1px solid var(--line); color:var(--paper);" /></div>
+        <div style="margin-top:12px;"><label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted);">Message</label><textarea id="inquiry-message" style="width:100%; padding:10px; background:transparent; border:1px solid var(--line); color:var(--paper); height:100px;"></textarea></div>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button type="submit" class="btn btn-solid">Send Inquiry</button>
+          <button type="button" id="inquiry-cancel" class="btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Login form">
+  <div class="modal login-card">
+    <button id="closeBtn" class="close" type="button" aria-label="Close login dialog">&times;</button>
+    <h2>Login</h2>
+
+    <div class="who-toggle">
+      <button class="who-btn active" data-role="buyer" type="button">Buyer/Owner</button>
+      <button class="who-btn" data-role="agent" type="button">Agent/Builder</button>
+    </div>
+
+    <p class="subtitle">Enter Mobile No.</p>
+    <div class="input-row">
+      <span class="country-code">+91</span>
+      <input id="mobileInput" type="tel" maxlength="10" placeholder="Enter Mobile No." inputmode="numeric">
+    </div>
+
+    <div class="captcha-panel">
+      <div class="captcha-box">
+        <span id="captchaText">AB9K2</span>
+        <button id="refreshCaptcha" class="captcha-refresh" type="button" aria-label="Refresh captcha">⟳</button>
+      </div>
+      <input id="captchaInput" type="text" maxlength="6" placeholder="Enter captcha">
+    </div>
+
+    <button id="nextBtn" class="primary" type="button">Next</button>
+
+    <!-- OTP Step (hidden until OTP is requested) -->
+    <div id="otpStep" style="display:none; margin-top:12px;">
+      <p class="subtitle">Enter the 4-digit OTP sent to your mobile</p>
+      <div class="input-row">
+        <input id="otpInput" type="text" maxlength="6" placeholder="Enter OTP" inputmode="numeric">
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+        <button id="verifyBtn" class="primary" type="button">Verify OTP</button>
+        <button id="resendBtn" class="google" type="button">Resend</button>
+        <span id="otpTimer" style="margin-left:auto; color:var(--paper-dim); font-size:13px;"></span>
+      </div>
+    </div>
+
+    <div class="help-row">
+      <a href="#" id="helpLink">Need help?</a>
+    </div>
+
+    <div class="divider"><span>Or login using</span></div>
+    <button id="googleLogin" class="google" type="button">Continue with Google</button>
+
+    <div class="register-row">New to Indian Realty Hub? <a href="#" id="registerLink">Sign Up</a></div>
+  </div>
+</div>
+
 <script>
+/* ============================================================
+   API CONSTANT
+============================================================ */
+const API = "http://127.0.0.1:8000/api";
+
 /* ============================================================
    IMAGE FALLBACK HELPER
 ============================================================ */
@@ -622,6 +707,41 @@ cities.forEach(c=>{
   });
   cityGrid.appendChild(el);
 });
+
+// Attempt to load cities from backend API and replace static list if available
+async function loadCities(){
+  try{
+    const response = await fetch(`${API}/cities/?format=json`);
+    const data = await response.json();
+    console.log(data);
+
+    const citySelect = document.getElementById('search-city');
+    if(citySelect){
+      citySelect.innerHTML = '<option value="">All Cities</option>';
+      (data.results || []).forEach(city=>{
+        citySelect.innerHTML += `\n          <option value="${city.name}">${city.name}</option>`;
+      });
+    }
+
+    cityGrid.innerHTML = "";
+    (data.results || []).forEach(c => {
+      const el = document.createElement("div");
+      el.className = "city-card";
+      el.innerHTML = `${imgTag(c.image || '', c.name)}<div class="city-info"><h4>${c.name}</h4><span>${c.listing_count || 0} Listings</span></div>`;
+      el.addEventListener('click', ()=>{
+        if(citySelect) citySelect.value = c.name;
+        filterByCity(c.name);
+        document.getElementById('listings').scrollIntoView({behavior:'smooth'});
+      });
+      cityGrid.appendChild(el);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// try remote cities (falls back to static above on error)
+loadCities();
 
 /* ============================================================
    DATA — LISTINGS
@@ -686,28 +806,89 @@ const listings = [
 ];
 
 const listingGrid = document.getElementById('listing-grid');
-listings.forEach(l=>{
-  const card = document.createElement('div');
-  card.className = 'listing-card show';
-  card.dataset.status = l.status;
-  card.dataset.city = l.city;
-  card.innerHTML = `
-    <div class="card-media">
-      ${imgTag(l.img, l.name)}
-      <div class="card-tag">${l.tag}</div>
-      <div class="card-city">${l.city}</div>
-      <div class="card-price">${l.priceLabel}</div>
-    </div>
-    <div class="card-body">
-      <h3>${l.name}</h3>
-      <div class="card-addr">${l.addr}</div>
-      <div class="card-specs">
-        <span>${l.beds} bd</span><span>${l.baths} ba</span><span>${l.sqft.toLocaleString('en-IN')} sqft</span><span>${l.type}</span>
+
+function normalizeProperty(src){
+  // map common fields from various backend schemas to our renderer
+  if(!src) return {};
+  const p = {};
+  p.id = src.id || src.pk || src.property_id || null;
+  p.name = src.title || src.name || src.property_name || '';
+  p.city = src.city || (src.location && src.location.city) || src.city_name || '';
+  p.addr = src.address || src.addr || src.location || '';
+  p.price = src.price || src.list_price || src.amount || 0;
+  p.priceLabel = src.price_label || src.priceLabel || (p.price ? formatLakhCrore(p.price) : '—');
+  p.status = (src.status || src.property_status || 'sale');
+  p.type = src.type || src.property_type || '';
+  p.beds = src.beds || src.bedrooms || src.no_of_bedrooms || '';
+  p.baths = src.baths || src.bathrooms || src.no_of_bathrooms || '';
+  p.sqft = src.sqft || src.area_sqft || src.size || '';
+  p.img = src.image_url || src.image || src.img || (src.images && src.images[0]) || '';
+  p.desc = src.description || src.desc || '';
+  p.tag = src.tag || (p.status==='rent' ? 'For Rent' : (p.status==='new' ? 'New Launch' : 'For Sale'));
+  return p;
+}
+
+function displayProperties(items){
+  listingGrid.innerHTML = '';
+  (items || []).forEach(src => {
+    const l = normalizeProperty(src);
+    console.log('Rendering:', l);
+    const card = document.createElement('div');
+    card.className = 'listing-card show';
+    card.dataset.status = l.status;
+    card.dataset.city = l.city;
+    const priceLabel = l.priceLabel || (l.price ? formatLakhCrore(l.price) : '—');
+    const sqft = l.sqft ? Number(l.sqft).toLocaleString('en-IN') : '';
+    card.innerHTML = `
+      <div class="card-media">
+        ${imgTag(l.img || '', l.name || '')}
+        <div class="card-tag">${l.tag || ''}</div>
+        <div class="card-city">${l.city || ''}</div>
+        <div class="card-price">${priceLabel}</div>
       </div>
-    </div>`;
-  card.addEventListener('click', ()=>openModal(l));
-  listingGrid.appendChild(card);
-});
+      <div class="card-body">
+        <h3>${l.name || ''}</h3>
+        <div class="card-addr">${l.addr || ''}</div>
+        <div class="card-specs">
+          <span>${l.beds || ''} bd</span><span>${l.baths || ''} ba</span><span>${sqft} sqft</span><span>${l.type || ''}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', ()=>openModal(l));
+    listingGrid.appendChild(card);
+  });
+}
+
+function scrollToListings(){
+  const target = document.getElementById('listings') || document.getElementById('listing-grid');
+  if(target){
+    target.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+}
+
+async function loadProperties() {
+    try {
+        const response = await fetch(`${API}/properties/`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch properties");
+        }
+
+        const data = await response.json();
+
+        console.log("API Response:", data);
+
+        if (data.results && data.results.length > 0) {
+            displayProperties(data.results);
+            scrollToListings();
+        } else {
+            console.log("No properties found.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+loadProperties();
 
 document.querySelectorAll('.filter-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -727,6 +908,106 @@ function filterByCity(city){
 }
 
 /* ============================================================
+   SEARCH + NEWSLETTER + INQUIRY + EMI BACKEND HOOKS
+============================================================ */
+document.getElementById("search-btn").addEventListener("click", async () => {
+    const city = document.getElementById("search-city").value;
+    const type = document.getElementById("search-type").value;
+
+    let url = `${API}/properties/?format=json`;
+
+    if(city) url += `&city=${encodeURIComponent(city)}`;
+    if(type) url += `&property_type=${encodeURIComponent(type)}`;
+
+    try{
+      const response = await fetch(url);
+      const data = await response.json();
+      displayProperties(data.results || []);
+    }catch(e){ console.error('Search fetch failed', e); }
+});
+
+document.getElementById("newsletter-form")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const email = document.getElementById("newsletter-email").value;
+
+    try{
+      const response = await fetch(`${API}/newsletter/subscribe/`, {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({ email: email })
+      });
+
+      if(response.ok) alert("Subscribed Successfully!");
+      else alert('Subscribe failed');
+    }catch(err){ console.error(err); alert('Subscribe error'); }
+});
+
+async function sendInquiryFromModal(propertyId){
+  // simple prompt-based form for demo purposes
+  const name = prompt('Your name');
+  if(!name) return;
+  const phone = prompt('Phone number');
+  if(!phone) return;
+  const email = prompt('Email (optional)') || '';
+  const message = prompt('Message (optional)') || '';
+
+  try{
+    const res = await fetch(`${API}/inquiries/`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ name, phone, email, property: propertyId, message })
+    });
+    if(res.ok) { alert('Inquiry sent — we will contact you soon'); closeModal(); }
+    else { alert('Could not send inquiry'); }
+  }catch(err){ console.error(err); alert('Inquiry error'); }
+}
+
+// EMI calculation via backend; debounce input changes
+let emiTimer = null;
+async function calculateEmi(){
+
+  const price = Number(document.getElementById('in-price').value);
+  const rate = Number(document.getElementById('in-rate').value);
+  const term = Number(document.getElementById('in-term').value);
+  const payload = { price: price, rate: rate, years: term };
+  try{
+    console.log('EMI Request Payload:', payload);
+    const response = await fetch(`${API}/emi/calculate/`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    if(!response.ok){
+      const errorBody = await response.text();
+      console.warn('EMI API returned', response.status, errorBody);
+      throw new Error('EMI API error');
+    }
+    const data = await response.json();
+    console.log('EMI Response:', data);
+    document.getElementById("out-monthly").innerText = data.monthly_emi || document.getElementById("out-monthly").innerText;
+    document.getElementById('out-loan').innerText = data.loan_amount || document.getElementById('out-loan').innerText;
+    document.getElementById('out-down').innerText = data.down_payment || document.getElementById('out-down').innerText;
+    document.getElementById('out-interest').innerText = data.total_interest || document.getElementById('out-interest').innerText;
+    document.getElementById('out-total').innerText = data.total_payable || document.getElementById('out-total').innerText;
+  }catch(err){ console.warn('EMI calc failed', err); }
+}
+
+['in-price','in-rate','in-term'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('input', ()=>{
+    clearTimeout(emiTimer);
+    emiTimer = setTimeout(()=>calculateEmi(), 600);
+  });
+});
+
+// initial EMI calc attempt
+calculateEmi();
+
+/* ============================================================
    MODAL
 ============================================================ */
 const backdrop = document.getElementById('modal-backdrop');
@@ -740,12 +1021,12 @@ function openModal(l){
     <div class="modal-specs">
       <div><span>${l.beds}</span>Bedrooms</div>
       <div><span>${l.baths}</span>Bathrooms</div>
-      <div><span>${l.sqft.toLocaleString('en-IN')}</span>Square Feet</div>
+      <div><span>${l.sqft ? Number(l.sqft).toLocaleString('en-IN') : ''}</span>Square Feet</div>
       <div><span>${l.type}</span>Property Type</div>
     </div>
     <div class="modal-desc">${l.desc}</div>
     <div class="modal-actions">
-      <a class="btn btn-solid" href="#contact" onclick="closeModal()">Request a Visit</a>
+      <a class="btn btn-solid" href="#" onclick="openInquiryModal(${l.id}); return false;">Request a Visit</a>
       <a class="btn" href="#calculator" onclick="closeModal(); setTimeout(()=>{ if(${l.price} > 1000000){ document.getElementById('in-price').value=${l.price}; document.getElementById('in-price').dispatchEvent(new Event('input')); } },400)">Calculate EMI</a>
     </div>
   `;
@@ -755,6 +1036,35 @@ function closeModal(){ backdrop.classList.remove('open'); }
 document.getElementById('modal-close').addEventListener('click', closeModal);
 backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) closeModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
+// Inquiry modal handlers
+document.getElementById('inquiry-close').addEventListener('click', ()=>{ document.getElementById('inquiry-backdrop').style.display='none'; });
+document.getElementById('inquiry-cancel').addEventListener('click', ()=>{ document.getElementById('inquiry-backdrop').style.display='none'; });
+function openInquiryModal(propertyId){
+  document.getElementById('inquiry-property-id').value = propertyId;
+  document.getElementById('inquiry-name').value = '';
+  document.getElementById('inquiry-phone').value = '';
+  document.getElementById('inquiry-email').value = '';
+  document.getElementById('inquiry-message').value = '';
+  document.getElementById('inquiry-backdrop').style.display = 'flex';
+}
+
+document.getElementById('inquiry-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const property = document.getElementById('inquiry-property-id').value;
+  const name = document.getElementById('inquiry-name').value;
+  const phone = document.getElementById('inquiry-phone').value;
+  const email = document.getElementById('inquiry-email').value;
+  const message = document.getElementById('inquiry-message').value;
+  try{
+    const res = await fetch('http://127.0.0.1:8000/api/inquiries/', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, phone, email, property, message })
+    });
+    if(res.ok){ alert('Inquiry sent — we will contact you soon'); document.getElementById('inquiry-backdrop').style.display='none'; closeModal(); }
+    else { const err = await res.json().catch(()=>null); alert('Could not send inquiry: ' + (err && err.detail ? err.detail : res.statusText)); }
+  }catch(err){ console.error(err); alert('Inquiry error'); }
+});
 
 /* ============================================================
    AGENTS
@@ -924,5 +1234,7 @@ const io = new IntersectionObserver((entries)=>{
 }, {threshold:0.15});
 revealEls.forEach(el=>io.observe(el));
 </script>
+<!-- Cache-bust login.js to ensure updated script loads during development -->
+<script src="login.js?v=2"></script>
 </body>
 </html>
